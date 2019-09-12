@@ -13,6 +13,7 @@ public class MoveSpeed : MonoBehaviour
     [SerializeField] private Mesh mesh;
     [SerializeField] private Material material;
     [SerializeField] private int instances = 16;
+    [SerializeField] private bool debug = false;
 
     void Start()
     {
@@ -58,6 +59,8 @@ public class MoveSpeed : MonoBehaviour
                 material = material
             });
         }
+
+        LevelUpSystem.debug = debug;
 
         entityArray.Dispose();
     }

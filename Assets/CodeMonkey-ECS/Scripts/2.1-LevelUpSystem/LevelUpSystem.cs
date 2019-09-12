@@ -5,12 +5,13 @@ using Unity.Entities;
 
 public class LevelUpSystem : ComponentSystem
 {
+    public static bool debug = false;
     protected override void OnUpdate()
     {
         Entities.ForEach((ref LevelComponent levelComponent) =>
         {
             levelComponent.level += 1f * Time.deltaTime;
-            Debug.Log(levelComponent.level);
+            if(debug) Debug.Log(levelComponent.level);
         });
     }
 }

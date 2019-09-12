@@ -17,7 +17,7 @@ public class GraphEntity : MonoBehaviour
     [SerializeField] private float offset = 0.0f;
     [SerializeField] private int fps = 30;
     [SerializeField] private int vsync = 1;
-    [SerializeField] private GraphFunctionName function;
+    [SerializeField] private GraphFunctionNameDots function;
     [SerializeField] private float scaleMult = 1f;
 
     void Start()
