@@ -15,10 +15,14 @@ public class GraphEntity : MonoBehaviour
     [SerializeField] private int resolution = 10;
     [SerializeField] private float speed = 1.0f;
     [SerializeField] private float offset = 0.0f;
+    [SerializeField] private float value1 = 0.0f;
+    [SerializeField] private float value2 = 0.0f;
+    [SerializeField] private float value3 = 0.0f;
     [SerializeField] private int fps = 30;
     [SerializeField] private int vsync = 1;
     [SerializeField] private GraphFunctionNameDots function;
     [SerializeField] private float scaleMult = 1f;
+    [SerializeField] private float scaleOffset = 0f;
 
     void Start()
     {
@@ -62,6 +66,11 @@ public class GraphEntity : MonoBehaviour
             GraphComponent.resolution = resolution;
             GraphComponent.speed = speed;
             GraphComponent.offset = offset;
+            GraphComponent.value1 = value1;
+            GraphComponent.value2 = value2;
+            GraphComponent.value3 = value3;
+            GraphComponent.scaleMult = scaleMult;
+            GraphComponent.scaleOffset = scaleOffset;
             GraphComponent.function = 0;
             entityManager.SetComponentData(entity,
                 new GraphComponent
@@ -85,6 +94,11 @@ public class GraphEntity : MonoBehaviour
     {
         GraphComponent.speed = speed;
         GraphComponent.offset = offset;
+        GraphComponent.value1 = value1;
+        GraphComponent.value2 = value2;
+        GraphComponent.value3 = value3;
+        GraphComponent.scaleMult = scaleMult;
+        GraphComponent.scaleOffset = scaleOffset;
         if (GraphComponent.function != (int)function)
         {
             GraphComponent.function = (int)function;

@@ -25,8 +25,7 @@ public class GraphSystem : ComponentSystem
     #region Unity API
     protected override void OnCreate()
     {
-        k1 = new Complex32();
-        k2 = new Complex32();
+
     }   
 
     protected override void OnUpdate()
@@ -36,12 +35,23 @@ public class GraphSystem : ComponentSystem
         int resolution = GraphComponent.resolution;
         float step = 2f / resolution;
 
-        Entities.ForEach((ref GraphComponent graphComponent, ref Translation translation) =>
+        Entities.ForEach((ref GraphComponent graphComponent, ref Translation translation, ref Scale scale) =>
         {
             float v = (graphComponent.id.x + 0.5f) * step - 1f;
             float u = (graphComponent.id.y + 0.5f) * step - 1f;
+
+            //float v = graphComponent.id.x;
+            //float u = graphComponent.id.y;
+
             translation.Value = f(u, v, t);
+
+            scale.Value = ScaleFunction(translation.Value);
         });
+    }
+
+    private float ScaleFunction(float3 value)
+    {
+        return math.length(float3.zero + value) * GraphComponent.scaleMult + GraphComponent.scaleOffset;
     }
     #endregion
 
@@ -136,73 +146,33 @@ public class GraphSystem : ComponentSystem
     #endregion
 
     #region My Complex Function
-    static Complex32 k1;
-    static Complex32 k2;
 
     static Vector3 MyFunction(float u, float v, float t)
     {
-        //u = i % resolution
-        //v = (i + resolution) / resolution
-        // float v = (graphComponent.id.x + 0.5f) * step - 1f;
-        // float u = (graphComponent.id.y + 0.5f) * step - 1f;
-        // failed attempt to pre-process the uv coordinate numbers to adapt to the original's required matching input functions
-        //u = u * GraphComponent.resolution;
-        //v = (v + GraphComponent.resolution) * GraphComponent.resolution;
-
         Vector3 p;
+        //u = math.remap(u, 0f, GraphComponent.resolution, 0f, math.PI / 2f);
+        //v = math.remap(v, 0f, GraphComponent.resolution, -math.PI/2f, math.PI / 2f);
+        float alpha = (u + v) * GraphComponent.resolution;
         
-        float n = 5;
-
-        //guessing
-        float a = u;
-        float b = v;
-        float alpha = t + (u + v) * GraphComponent.resolution;
-        k1 = new Complex32(a + math.sin(alpha) / GraphComponent.resolution, a + math.cos(alpha));
-        k2 = new Complex32(b + math.cos(alpha) / GraphComponent.resolution, b + math.sin(alpha));
-        //k1 = new Complex32(a, alpha);
-        //k2 = new Complex32(b, alpha);
-        //k1 = new Complex32(b * alpha, a * alpha);
-        //k2 = new Complex32(b * alpha, a * alpha);
-
-        Complex32 Z1k = z1k(a, b, n, k1);
-        Complex32 Z2k = z2k(a, b, n, k2);
-        
-        p.x = Re(Z1k);
-        p.y = Re(Z2k);
-        p.z = Im(Z1k * u + v * Z2k);
-        //p.z = Im(Z1k) * u + v * Im(Z2k);
-        //p.z = math.cos(alpha) * Im(Z1k) +
-        //      math.sin(alpha) * Im(Z2k);
-
+        p = Coordinate(u, v, t,
+            u * GraphComponent.resolution * GraphComponent.value1,
+            v * GraphComponent.resolution * GraphComponent.value2,
+            alpha * GraphComponent.value3);
         return p;
     }
 
-    private static Complex32 z1k(float a, float b, float n, Complex32 k1)
+    static Vector3 Coordinate(float x, float y, float n, float k1, float k2, float a)
     {
-        return Multiply(Pow(E, Multiply((Multiply(k1,new Complex32(2f * PI, Im(I)))), Divide(I, new Complex32(1f, n)))),
-            Pow(u1(a, b), (2f/n)));
+        Complex32 z1 = Multiply(
+            Exp(new Complex32(0, 2f * math.PI * k1 / n)),
+            Pow(Complex32.Sin(new Complex32(x, y)), 2 / n)
+        );
+        Complex32 z2 = Multiply(
+            Exp(new Complex32(0, 2f * math.PI * k2 / n)),
+            Pow(Sin(new Complex32(x, y)), 2 / n)
+        );
+        return new Vector3(z1.Real, z2.Real, z1.Imaginary * math.cos(a) + z2.Imaginary * math.sin(a));
     }
-
-    private static Complex32 z2k(float a, float b, float n, Complex32 k2)
-    {
-        return Multiply(Pow(E, Multiply((Multiply(k2, new Complex32(2f * PI, Im(I)))), Divide(I, new Complex32(1f, n)))),
-            Pow(u2(a, b), (2f / n)));
-    }
-
-    private static Complex32 u1(float a, float b)
-    {
-        return Add(
-            Multiply(new Complex32(0.5f, Im(I)), Pow(E, Add(new Complex32(a, Im(I)), Multiply(I, new Complex32(1f, b))))),
-            (Pow(E, Subtract(new Complex32(-a, Im(I)), Multiply(I, new Complex32(1f, b))))));
-    }
-
-    private static Complex32 u2(float a, float b)
-    {
-        return Subtract(
-            Multiply(new Complex32(0.5f, Im(I)), Pow(E, Add(new Complex32(a, Im(I)), Multiply(I, new Complex32(1f, b))))),
-            (Pow(E, Subtract(new Complex32(-a, Im(I)), Multiply(I, new Complex32(1f, b))))));
-    }
-
     #endregion
 
     #region Complex wrapper functions
@@ -211,6 +181,7 @@ public class GraphSystem : ComponentSystem
     public static Complex32 I { get { return Complex32.ImaginaryOne; } }
     public static Complex32 Cos(Complex32 input) { return Complex32.Cos(input); }
     public static Complex32 Sin(Complex32 input) { return Complex32.Sin(input); }
+    public static Complex32 Exp(Complex32 value) { return Complex32.Exp(value); }
     public static Complex32 Pow(Complex32 val, Complex32 pow) { return Complex32.Pow(val, pow); }
     public static Complex32 Add(Complex32 left, Complex32 right) { return Complex32.Add(left, right); }
     public static Complex32 Subtract(Complex32 left, Complex32 right) { return Complex32.Subtract(left, right); }
