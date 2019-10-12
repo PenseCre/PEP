@@ -24,12 +24,40 @@ public class GraphEntity : MonoBehaviour
     [SerializeField] private float scaleMult = 1f;
     [SerializeField] private float scaleOffset = 0f;
 
+    public float GraphTime { get => Time.time * GraphComponent.speed + GraphComponent.offset; }
+    public float Speed { get => speed; set => speed = value; }
+    public float Offset { get => offset; set => offset = value; }
+    public float Value1 { get => value1; set => value1 = value; }
+    public float Value2 { get => value2; set => value2 = value; }
+    public float Value3 { get => value3; set => value3 = value; }
+    public int Fps { get => fps; set => fps = value; }
+    public int Vsync { get => vsync; set => vsync = value; }
+    public int Function { get => (int)function; set => function = (GraphFunctionNameDots)value; }
+    public float ScaleMult { get => scaleMult; set => scaleMult = value; }
+    public float ScaleOffset { get => scaleOffset; set => scaleOffset = value; }
+
+    public string Str_GraphTime { get => GraphTime.ToString(); set { } }
+    public string Str_Speed { get => speed.ToString(); set => speed = float.Parse(value); }
+    public string Str_Offset { get => offset.ToString(); set => offset = float.Parse(value); }
+    public string Str_Value1 { get => value1.ToString(); set => value1 = float.Parse(value); }
+    public string Str_Value2 { get => value2.ToString(); set => value2 = float.Parse(value); }
+    public string Str_Value3 { get => value3.ToString(); set => value3 = float.Parse(value); }
+    public string Str_Fps { get => fps.ToString(); set => fps = int.Parse(value); }
+    public string Str_Vsync { get => vsync.ToString(); set => vsync = int.Parse(value); }
+    public string Str_ScaleMult { get => scaleMult.ToString(); set => scaleMult = float.Parse(value); }
+    public string Str_ScaleOffset { get => scaleOffset.ToString(); set => scaleOffset = float.Parse(value); }
+
+    public void TakeScreenshot()
+    {
+        ScreenCapture.CaptureScreenshot("PenseCre.png");
+    }
+
     void Start()
     {
-        Application.targetFrameRate = fps;
-        QualitySettings.vSyncCount = vsync;
+        Application.targetFrameRate = Fps;
+        QualitySettings.vSyncCount = Vsync;
 
-        float step = 2f / resolution * scaleMult;
+        float step = 2f / resolution * ScaleMult;
         Vector3 scale = Vector3.one * step;
 
         EntityManager entityManager = World.Active.EntityManager;
@@ -64,13 +92,13 @@ public class GraphEntity : MonoBehaviour
             );
 
             GraphComponent.resolution = resolution;
-            GraphComponent.speed = speed;
-            GraphComponent.offset = offset;
-            GraphComponent.value1 = value1;
-            GraphComponent.value2 = value2;
-            GraphComponent.value3 = value3;
-            GraphComponent.scaleMult = scaleMult;
-            GraphComponent.scaleOffset = scaleOffset;
+            GraphComponent.speed = Speed;
+            GraphComponent.offset = Offset;
+            GraphComponent.value1 = Value1;
+            GraphComponent.value2 = Value2;
+            GraphComponent.value3 = Value3;
+            GraphComponent.scaleMult = ScaleMult;
+            GraphComponent.scaleOffset = ScaleOffset;
             GraphComponent.function = 0;
             entityManager.SetComponentData(entity,
                 new GraphComponent
@@ -92,16 +120,16 @@ public class GraphEntity : MonoBehaviour
 
     private void Update()
     {
-        GraphComponent.speed = speed;
-        GraphComponent.offset = offset;
-        GraphComponent.value1 = value1;
-        GraphComponent.value2 = value2;
-        GraphComponent.value3 = value3;
-        GraphComponent.scaleMult = scaleMult;
-        GraphComponent.scaleOffset = scaleOffset;
-        if (GraphComponent.function != (int)function)
+        GraphComponent.speed = Speed;
+        GraphComponent.offset = Offset;
+        GraphComponent.value1 = Value1;
+        GraphComponent.value2 = Value2;
+        GraphComponent.value3 = Value3;
+        GraphComponent.scaleMult = ScaleMult;
+        GraphComponent.scaleOffset = ScaleOffset;
+        if (GraphComponent.function != (int)Function)
         {
-            GraphComponent.function = (int)function;
+            GraphComponent.function = (int)Function;
         }
     }
 }
