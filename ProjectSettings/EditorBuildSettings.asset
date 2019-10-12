@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/PenseCre/SceneDots.unity
+    guid: eafaa098d354e344590d356b431dd4d8
   m_configObjects: {}
