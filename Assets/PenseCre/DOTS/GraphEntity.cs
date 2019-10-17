@@ -8,6 +8,8 @@ using Unity.Rendering;
 using Unity.Mathematics;
 using Random = UnityEngine.Random;
 using UnityEngine.SceneManagement;
+using System.IO;
+using PenseCre;
 
 public class GraphEntity : MonoBehaviour
 {
@@ -54,7 +56,55 @@ public class GraphEntity : MonoBehaviour
 
     public void TakeScreenshot()
     {
-        ScreenCapture.CaptureScreenshot("PenseCre.png");
+        string userPath = string.Empty;
+        string systemPathChar = string.Empty;
+        switch (Application.platform)
+        {
+            case RuntimePlatform.OSXEditor:
+                break;
+            case RuntimePlatform.OSXPlayer:
+                break;
+            case RuntimePlatform.WindowsPlayer:
+                userPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+                systemPathChar = @"\";
+                break;
+            case RuntimePlatform.WindowsEditor:
+                userPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+                systemPathChar = @"\";
+                break;
+            case RuntimePlatform.IPhonePlayer:
+                break;
+            case RuntimePlatform.Android:
+                break;
+            case RuntimePlatform.LinuxPlayer:
+                break;
+            case RuntimePlatform.LinuxEditor:
+                break;
+            case RuntimePlatform.WebGLPlayer:
+                break;
+            case RuntimePlatform.PS4:
+                break;
+            case RuntimePlatform.XboxOne:
+                break;
+            case RuntimePlatform.tvOS:
+                break;
+            case RuntimePlatform.Switch:
+                break;
+            case RuntimePlatform.Lumin:
+                break;
+            case RuntimePlatform.BJM:
+                break;
+            default:
+                break;
+        }
+        if (string.IsNullOrEmpty(userPath)) return;
+
+        string name = "PenseCre";
+        string ext = ".png";
+        string dateTime = FileUtils.GetFormattedDate();
+        string uniqueNamefullPath = FileUtils.UniqueNameFullPath(userPath + systemPathChar, name + " " + dateTime, ext);
+        
+        ScreenCapture.CaptureScreenshot(uniqueNamefullPath, 1);
     }
 
     void Start()
