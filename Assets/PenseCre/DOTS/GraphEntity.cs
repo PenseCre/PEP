@@ -7,6 +7,7 @@ using Unity.Collections;
 using Unity.Rendering;
 using Unity.Mathematics;
 using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement;
 
 public class GraphEntity : MonoBehaviour
 {
@@ -24,7 +25,9 @@ public class GraphEntity : MonoBehaviour
     [SerializeField] private float scaleMult = 1f;
     [SerializeField] private float scaleOffset = 0f;
 
-    public float GraphTime { get => Time.time * GraphComponent.speed + GraphComponent.offset; }
+    public static float startTime = 0;
+    public float GraphTime { get => (Time.timeSinceLevelLoad - startTime) * GraphComponent.speed + GraphComponent.offset; }
+
     public float Speed { get => speed; set => speed = value; }
     public float Offset { get => offset; set => offset = value; }
     public float Value1 { get => value1; set => value1 = value; }
@@ -35,6 +38,7 @@ public class GraphEntity : MonoBehaviour
     public int Function { get => (int)function; set => function = (GraphFunctionNameDots)value; }
     public float ScaleMult { get => scaleMult; set => scaleMult = value; }
     public float ScaleOffset { get => scaleOffset; set => scaleOffset = value; }
+    public float Resolution { get => resolution; set => resolution = (int)value; }
 
     public string Str_GraphTime { get => GraphTime.ToString(); set { } }
     public string Str_Speed { get => speed.ToString(); set => speed = float.Parse(value); }
@@ -46,6 +50,7 @@ public class GraphEntity : MonoBehaviour
     public string Str_Vsync { get => vsync.ToString(); set => vsync = int.Parse(value); }
     public string Str_ScaleMult { get => scaleMult.ToString(); set => scaleMult = float.Parse(value); }
     public string Str_ScaleOffset { get => scaleOffset.ToString(); set => scaleOffset = float.Parse(value); }
+    public string Str_Resolution { get => resolution.ToString(); set => resolution = int.Parse(value); }
 
     public void TakeScreenshot()
     {
@@ -56,6 +61,10 @@ public class GraphEntity : MonoBehaviour
     {
         Application.targetFrameRate = Fps;
         QualitySettings.vSyncCount = Vsync;
+
+        if (PlayerPrefs.HasKey(nameof(resolution))){
+            resolution = PlayerPrefs.GetInt(nameof(resolution));
+        }
 
         float step = 2f / resolution * ScaleMult;
         Vector3 scale = Vector3.one * step;
@@ -131,5 +140,22 @@ public class GraphEntity : MonoBehaviour
         {
             GraphComponent.function = (int)Function;
         }
+
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            Reset();
+        }
+    }
+
+    public void Reset()
+    {
+        var allEntities = World.Active.EntityManager.GetAllEntities(Allocator.Temp);
+        if (allEntities == null) return;
+        World.Active.EntityManager.DestroyEntity(allEntities);
+        allEntities.Dispose();
+        PlayerPrefs.SetInt(nameof(resolution), resolution);
+        startTime = Time.timeSinceLevelLoad;
+        Start();
+        //SceneManager.LoadScene(0);
     }
 }

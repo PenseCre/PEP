@@ -30,7 +30,7 @@ public class GraphSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        float t = Time.time * GraphComponent.speed + GraphComponent.offset;
+        float t = (Time.timeSinceLevelLoad - GraphEntity.startTime) * GraphComponent.speed + GraphComponent.offset;
         GraphFunction f = functions[GraphComponent.function];
         int resolution = GraphComponent.resolution;
         float step = 2f / resolution;
