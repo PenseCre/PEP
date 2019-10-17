@@ -35,7 +35,7 @@ public class FeedbackInputField : MonoBehaviour
 
     void Update()
     {
-        if (!inputField) return;
+        if (!inputField || inputField.isFocused) return;
         try
         {
             string v;
