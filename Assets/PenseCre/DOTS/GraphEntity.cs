@@ -75,6 +75,10 @@ public class GraphEntity : MonoBehaviour
             case RuntimePlatform.IPhonePlayer:
                 break;
             case RuntimePlatform.Android:
+                var jc = new AndroidJavaClass("android.os.Environment");
+                //userPath = jc.CallStatic<AndroidJavaObject>("getExternalStorageDirectory").Call<string>("getAbsolutePath");
+                userPath = @jc.CallStatic<AndroidJavaObject>("getExternalStoragePublicDirectory", jc.GetStatic<string>("DIRECTORY_DCIM")).Call<string>("getAbsolutePath");
+                systemPathChar = "";
                 break;
             case RuntimePlatform.LinuxPlayer:
                 break;
@@ -102,8 +106,8 @@ public class GraphEntity : MonoBehaviour
         string name = "PenseCre";
         string ext = ".png";
         string dateTime = FileUtils.GetFormattedDate();
-        string uniqueNamefullPath = FileUtils.UniqueNameFullPath(userPath + systemPathChar, name + " " + dateTime, ext);
-        
+        string uniqueNamefullPath = FileUtils.UniqueNameFullPath(@userPath + @systemPathChar, name + " " + dateTime, ext);
+        Debug.Log(uniqueNamefullPath);
         ScreenCapture.CaptureScreenshot(uniqueNamefullPath, 1);
     }
 

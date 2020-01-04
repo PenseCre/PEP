@@ -7,9 +7,9 @@ namespace PenseCre
 {
     public class FileUtils
     {
-        public static string UniqueNameFullPath(string path, string name, string extension)
+        public static string UniqueNameFullPath(string @path, string name, string extension)
         {
-            string proposedFullName = path + name + extension;
+            string proposedFullName = @Path.Combine(@path, name + extension);
             int i = 0;
             while (File.Exists(proposedFullName))
             {
@@ -22,12 +22,12 @@ namespace PenseCre
                     if (isContentANumber)
                     {
                         name = name.Substring(0, indexLastOpenParenthesis) + (existingNumber + 1).ToString() + ")";
-                        proposedFullName = path + name + extension;
+                        proposedFullName = @Path.Combine(@path, name + extension);
                         continue;
                     }
                 }
                 name += " (" + i.ToString() + ")";
-                proposedFullName = path + name + extension;
+                proposedFullName = @Path.Combine(@path, name + extension);
                 i++;
             }
             return proposedFullName;

@@ -6,6 +6,9 @@ public class FeedbackSlider : MonoBehaviour
     private Slider slider;
     private Object onEndEdit;
     private string onEndEditMethodName;
+    public bool adjustMinMax = false;
+    [Range(0.001f, float.MaxValue)]
+    public float minMaxRange = 1f;
 
     void Start()
     {
@@ -27,6 +30,17 @@ public class FeedbackSlider : MonoBehaviour
         return src.GetType().GetProperty(propName).GetValue(src, null);
     }
 
+    public void AdjustMinMax(float v)
+    {
+        slider.minValue = v - minMaxRange;
+        slider.maxValue = v + minMaxRange;
+    }
+
+    public void AdjustMinMax()
+    {
+        AdjustMinMax(slider.value);
+    }
+
     void Update()
     {
         try
@@ -37,6 +51,12 @@ public class FeedbackSlider : MonoBehaviour
             {
                 if (v != slider.value && v != float.NaN)
                 {
+                    if (adjustMinMax/* && (v - minMaxRange) != slider.minValue*/)
+                    {
+                        slider.minValue = v - minMaxRange;
+                        slider.maxValue = v + minMaxRange;
+                        adjustMinMax = false;
+                    }
                     slider.value = v;
                 }
             }
