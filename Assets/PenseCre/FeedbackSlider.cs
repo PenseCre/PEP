@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class FeedbackSlider : MonoBehaviour
@@ -6,17 +7,28 @@ public class FeedbackSlider : MonoBehaviour
     private Slider slider;
     private Object onEndEdit;
     private string onEndEditMethodName;
+    public UnityEvent UpdateCallback;
+    public FeedbackSlider mutuallyExclusiveLink;
     public bool adjustMinMax = false;
+    private bool adjustMinMax_persistent = false;
     [Range(0.001f, float.MaxValue)]
     public float minMaxRange = 1f;
-
+    public int onValueChangedMethodID = 0;
+    private void Awake()
+    {
+        adjustMinMax_persistent = adjustMinMax;
+    }
+    private void OnEnable()
+    {
+        adjustMinMax = adjustMinMax_persistent;
+    }
     void Start()
     {
         try
         {
             slider = GetComponent<Slider>();
-            onEndEdit = slider.onValueChanged.GetPersistentTarget(0);
-            onEndEditMethodName = slider.onValueChanged.GetPersistentMethodName(0).Remove(0, 4);
+            onEndEdit = slider.onValueChanged.GetPersistentTarget(onValueChangedMethodID);
+            onEndEditMethodName = slider.onValueChanged.GetPersistentMethodName(onValueChangedMethodID).Remove(0, 4);
         }
         catch (System.Exception e)
         {
@@ -25,9 +37,22 @@ public class FeedbackSlider : MonoBehaviour
         }
     }
 
+
     public static object GetPropValue(object src, string propName)
     {
         return src.GetType().GetProperty(propName).GetValue(src, null);
+    }
+
+    public void SendValueToMutuallyExclusivelyLinkedSlider()
+    {
+        if (mutuallyExclusiveLink == null) return;
+        mutuallyExclusiveLink.slider.minValue = slider.minValue;
+        mutuallyExclusiveLink.slider.maxValue = slider.maxValue;
+        mutuallyExclusiveLink.slider.value = slider.value;
+        if (mutuallyExclusiveLink.adjustMinMax)
+        {
+            mutuallyExclusiveLink.AdjustMinMax();
+        }
     }
 
     public void AdjustMinMax(float v)
@@ -51,13 +76,14 @@ public class FeedbackSlider : MonoBehaviour
             {
                 if (v != slider.value && v != float.NaN)
                 {
-                    if (adjustMinMax/* && (v - minMaxRange) != slider.minValue*/)
+                    if (adjustMinMax_persistent && adjustMinMax/* && (v - minMaxRange) != slider.minValue*/)
                     {
                         slider.minValue = v - minMaxRange;
                         slider.maxValue = v + minMaxRange;
                         adjustMinMax = false;
                     }
                     slider.value = v;
+                    UpdateCallback?.Invoke();
                 }
             }
             else
