@@ -81,23 +81,8 @@ public class GraphEntity : MonoBehaviour
                 systemPathChar = "";
                 break;
             case RuntimePlatform.LinuxPlayer:
-                break;
             case RuntimePlatform.LinuxEditor:
-                break;
             case RuntimePlatform.WebGLPlayer:
-                break;
-            case RuntimePlatform.PS4:
-                break;
-            case RuntimePlatform.XboxOne:
-                break;
-            case RuntimePlatform.tvOS:
-                break;
-            case RuntimePlatform.Switch:
-                break;
-            case RuntimePlatform.Lumin:
-                break;
-            case RuntimePlatform.BJM:
-                break;
             default:
                 break;
         }
