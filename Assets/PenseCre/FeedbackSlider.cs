@@ -11,9 +11,13 @@ public class FeedbackSlider : MonoBehaviour
     public FeedbackSlider mutuallyExclusiveLink;
     public bool adjustMinMax = false;
     private bool adjustMinMax_persistent = false;
+    private bool selected = false;
     [Range(0.001f, float.MaxValue)]
     public float minMaxRange = 1f;
     public int onValueChangedMethodID = 0;
+
+    public bool Selected { get => selected; set => selected = value; }
+
     private void Awake()
     {
         adjustMinMax_persistent = adjustMinMax;
@@ -46,6 +50,7 @@ public class FeedbackSlider : MonoBehaviour
     public void SendValueToMutuallyExclusivelyLinkedSlider()
     {
         if (mutuallyExclusiveLink == null) return;
+        if (mutuallyExclusiveLink.selected) return;
         mutuallyExclusiveLink.slider.minValue = slider.minValue;
         mutuallyExclusiveLink.slider.maxValue = slider.maxValue;
         mutuallyExclusiveLink.slider.value = slider.value;
@@ -68,6 +73,7 @@ public class FeedbackSlider : MonoBehaviour
 
     void Update()
     {
+        if (selected) return;
         try
         {
             float v;
