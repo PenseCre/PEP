@@ -13,11 +13,11 @@ public class EntityRendering : MonoBehaviour
 
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(LevelComponent),
-            typeof(Translation),
+            typeof(LocalTransform/*Translation*/),
             typeof(RenderMesh),
             typeof(LocalToWorld)
         );
@@ -30,7 +30,7 @@ public class EntityRendering : MonoBehaviour
             Entity entity = entityArray[i];
             entityManager.SetComponentData(entity, new LevelComponent { level = Random.Range(10, 20) });
 
-            entityManager.SetSharedComponentData(entity, new RenderMesh {
+            entityManager.SetSharedComponentManaged(entity, new RenderMesh {
                 mesh = mesh,
                 material = material
             });

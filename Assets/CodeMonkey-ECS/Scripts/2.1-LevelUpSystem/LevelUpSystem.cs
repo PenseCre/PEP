@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
 
-public class LevelUpSystem : ComponentSystem
-{
+public class LevelUpSystem : MonoBehaviour//ComponentSystem
+{/*
     public static bool debug = false;
     protected override void OnUpdate()
     {
@@ -13,5 +13,5 @@ public class LevelUpSystem : ComponentSystem
             levelComponent.level += 1f * Time.deltaTime;
             if(debug) Debug.Log(levelComponent.level);
         });
-    }
+    }*/
 }

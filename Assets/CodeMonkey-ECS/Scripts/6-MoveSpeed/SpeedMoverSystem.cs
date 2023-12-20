@@ -5,8 +5,8 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 
-public class SpeedMoverSystem : ComponentSystem
-{
+public class SpeedMoverSystem : MonoBehaviour// ComponentSystem
+{/*
     protected override void OnUpdate()
     {
         Entities.ForEach((ref Translation translation, ref MoveSpeedComponent moveSpeedComponent) =>
@@ -21,5 +21,5 @@ public class SpeedMoverSystem : ComponentSystem
                 moveSpeedComponent.moveSpeed = +math.abs(moveSpeedComponent.moveSpeed);
             }
         });
-    }
+    }*/
 }

@@ -8,11 +8,11 @@ public class SetEntityArchetype : MonoBehaviour
 {
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(LevelComponent),
-            typeof(Translation)
+            typeof(LocalTransform/*Translation*/)
         );
 
         Entity entity = entityManager.CreateEntity(entityArchetype);

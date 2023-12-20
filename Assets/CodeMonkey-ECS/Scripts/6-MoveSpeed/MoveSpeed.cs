@@ -13,15 +13,15 @@ public class MoveSpeed : MonoBehaviour
     [SerializeField] private Mesh mesh;
     [SerializeField] private Material material;
     [SerializeField] private int instances = 16;
-    [SerializeField] private bool debug = false;
+    //[SerializeField] private bool debug = false;
 
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(LevelComponent),
-            typeof(Translation),
+            typeof(LocalTransform/*Translation*/),
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(MoveSpeedComponent)
@@ -48,19 +48,19 @@ public class MoveSpeed : MonoBehaviour
             );
 
             entityManager.SetComponentData(entity,
-                new Translation
+                new LocalTransform/*Translation*/
                 {
-                    Value = new float3(Random.Range(-8f, 8f), Random.Range(-5f, 5f), 0)
+                    Position = new float3(Random.Range(-8f, 8f), Random.Range(-5f, 5f), 0)
                 }
             );
 
-            entityManager.SetSharedComponentData(entity, new RenderMesh {
+            entityManager.SetSharedComponentManaged(entity, new RenderMesh {
                 mesh = mesh,
                 material = material
             });
         }
 
-        LevelUpSystem.debug = debug;
+        //LevelUpSystem.debug = debug;
 
         entityArray.Dispose();
     }

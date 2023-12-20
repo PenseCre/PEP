@@ -7,7 +7,7 @@ public class CreateEntity : MonoBehaviour
 {
     void Start()
     {
-        EntityManager em = World.Active.EntityManager;
+        EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
         em.CreateEntity();
     }
 }

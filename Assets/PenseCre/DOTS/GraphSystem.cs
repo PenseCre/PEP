@@ -7,7 +7,14 @@ using Unity.Mathematics;
 using MathNet.Numerics;
 using System;
 
-public class GraphSystem : ComponentSystem
+public struct LocalTransform : IComponentData
+{
+    public float3 Position;
+    public float Scale;
+    public quaternion Rotation;
+}
+
+public partial class GraphSystem : SystemBase //ComponentSystem
 {
 
     #region Declarations
@@ -30,23 +37,26 @@ public class GraphSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        float t = (Time.timeSinceLevelLoad - GraphEntity.startTime) * GraphComponent.speed + GraphComponent.offset;
+        float timeSinceLevelLoad = (float)SystemAPI.Time.ElapsedTime;
+        float t = (timeSinceLevelLoad - GraphEntity.startTime) * GraphComponent.speed + GraphComponent.offset;
         GraphFunction f = functions[GraphComponent.function];
         int resolution = GraphComponent.resolution;
         float step = 2f / resolution;
 
-        Entities.ForEach((ref GraphComponent graphComponent, ref Translation translation, ref Scale scale) =>
+        Entities
+            .WithoutBurst()
+            .ForEach((ref GraphComponent graphComponent, ref LocalToWorld localTransform) =>
         {
             float v = (graphComponent.id.x + 0.5f) * step - 1f;
             float u = (graphComponent.id.y + 0.5f) * step - 1f;
 
             //float v = graphComponent.id.x;
             //float u = graphComponent.id.y;
-
-            translation.Value = f(u, v, t);
-
-            scale.Value = ScaleFunction(translation.Value);
-        });
+            
+            var pos = f(u, v, t);
+            
+            localTransform.Value = Matrix4x4.TRS(pos, Quaternion.identity, ScaleFunction(pos) * Vector3.one);
+        }).Run();
     }
 
     private float ScaleFunction(float3 value)

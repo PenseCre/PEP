@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 using UnityEngine.SceneManagement;
 using System.IO;
 using PenseCre;
+using UnityEngine.Rendering;
 
 public class GraphEntity : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class GraphEntity : MonoBehaviour
     [SerializeField] private float scaleOffset = 0f;
 
     public static float startTime = 0;
+
+    #region GET/SETTERS
     public float GraphTime { get => (Time.timeSinceLevelLoad - startTime) * GraphComponent.speed + GraphComponent.offset; }
 
     public float Speed { get => speed; set => speed = value; }
@@ -53,6 +56,7 @@ public class GraphEntity : MonoBehaviour
     public string Str_ScaleMult { get => scaleMult.ToString(); set => scaleMult = float.Parse(value); }
     public string Str_ScaleOffset { get => scaleOffset.ToString(); set => scaleOffset = float.Parse(value); }
     public string Str_Resolution { get => resolution.ToString(); set => resolution = int.Parse(value); }
+    #endregion
 
     public void TakeScreenshot()
     {
@@ -108,11 +112,10 @@ public class GraphEntity : MonoBehaviour
         float step = 2f / resolution * ScaleMult;
         Vector3 scale = Vector3.one * step;
 
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
-            typeof(Translation),
-            typeof(Scale),
+            typeof(LocalTransform/*Translation*/),
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(GraphComponent)
@@ -121,23 +124,26 @@ public class GraphEntity : MonoBehaviour
         NativeArray<Entity> entityArray = new NativeArray<Entity>(resolution*resolution, Allocator.Temp);
         entityManager.CreateEntity(entityArchetype, entityArray);
 
+        // Create a RenderMeshDescription using the convenience constructor
+        // with named parameters.
+        var desc = new RenderMeshDescription(
+            shadowCastingMode: ShadowCastingMode.Off,
+            receiveShadows: false);
+
+        // Create an array of mesh and material required for runtime rendering.
+        var renderMeshArray = new RenderMeshArray(new Material[] { material }, new Mesh[] { mesh });
+
         for (int i = 0; i < entityArray.Length; i++)
         {
             Entity entity = entityArray[i];
 
-            entityManager.SetComponentData(entity,
-                new Translation
-                {
-                    //Value = new float3(Random.Range(-8f, 8f), Random.Range(-5f, 5f), 0)
-                }
-            );
-
-            entityManager.SetComponentData(entity,
-                new Scale
-                {
-                    Value = step
-                }
-            );
+            //entityManager.SetComponentData(entity,
+            //    new LocalTransform/*Translation*/
+            //    {
+            //        //Position = new float3(Random.Range(-8f, 8f), Random.Range(-5f, 5f), 0)
+            //        Scale = step
+            //    }
+            //);
 
             GraphComponent.resolution = resolution;
             GraphComponent.speed = Speed;
@@ -156,11 +162,15 @@ public class GraphEntity : MonoBehaviour
                 }
             );
 
-            entityManager.SetSharedComponentData(entity, new RenderMesh
-            {
-                mesh = mesh,
-                material = material
-            });
+            // Call AddComponents to populate base entity with the components required
+            // by Entities Graphics
+            RenderMeshUtility.AddComponents(
+                entity,
+                entityManager,
+                desc,
+                renderMeshArray,
+                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+            entityManager.AddComponentData(entity, new LocalToWorld());
         }
 
         entityArray.Dispose();
@@ -188,9 +198,9 @@ public class GraphEntity : MonoBehaviour
 
     public void Reset()
     {
-        var allEntities = World.Active.EntityManager.GetAllEntities(Allocator.Temp);
+        var allEntities = World.DefaultGameObjectInjectionWorld.EntityManager.GetAllEntities(Allocator.Temp);
         if (allEntities == null) return;
-        World.Active.EntityManager.DestroyEntity(allEntities);
+        World.DefaultGameObjectInjectionWorld.EntityManager.DestroyEntity(allEntities);
         allEntities.Dispose();
         PlayerPrefs.SetInt(nameof(resolution), resolution);
         startTime = Time.timeSinceLevelLoad;

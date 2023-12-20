@@ -9,11 +9,11 @@ public class EntityNativeArray : MonoBehaviour
 {
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(LevelComponent),
-            typeof(Translation)
+            typeof(LocalTransform/*Translation*/)
         );
 
         NativeArray<Entity> entityArray = new NativeArray<Entity>(16, Allocator.Temp);

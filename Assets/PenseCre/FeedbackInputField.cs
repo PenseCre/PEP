@@ -12,7 +12,10 @@ public class FeedbackInputField : MonoBehaviour
         try
         {
             inputField = GetComponent<InputField>();
-            onEndEdit = inputField.onEndEdit.GetPersistentTarget(0);
+            if (inputField.onEndEdit.GetPersistentEventCount() > 0)
+            {
+                onEndEdit = inputField.onEndEdit.GetPersistentTarget(0);
+            }
             if (onEndEdit == null)
             {
                 inputField = null;
@@ -23,7 +26,7 @@ public class FeedbackInputField : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            Debug.LogError(e.StackTrace);
+            Debug.LogError(e.Message + "\n" + e.StackTrace);
             throw;
         }
     }
@@ -36,6 +39,7 @@ public class FeedbackInputField : MonoBehaviour
     void Update()
     {
         if (!inputField || inputField.isFocused) return;
+        if (onEndEdit == null) return;
         try
         {
             string v;

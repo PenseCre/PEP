@@ -7,7 +7,7 @@ public class SetComponentData : MonoBehaviour
 {
     void Start()
     {
-        EntityManager entityManager = World.Active.EntityManager;
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         Entity entity = entityManager.CreateEntity(typeof(MyComponent));
 
         entityManager.SetComponentData(entity, new MyComponent { level = 10f });

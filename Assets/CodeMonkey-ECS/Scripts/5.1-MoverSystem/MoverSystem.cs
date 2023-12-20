@@ -5,9 +5,9 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 
-public class MoverSystem : ComponentSystem
+public class MoverSystem : MonoBehaviour// ComponentSystem
 {
-    protected override void OnUpdate()
+    protected /*override*/ void OnUpdate()
     {
         /*********** uncomment code below ***********/
         
